@@ -12,24 +12,23 @@ from torchvision import transforms
 from torchvision.models import vgg16
 from torch.utils.data import Dataset, DataLoader
 
-import utils
-from model import Auto_Encoder
-
 from cfg import Config
+from model import Auto_Encoder
 
 cfg = Config()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# data loading 
-# just drop all your images inside a folder in data
-
 class ImagePatchDataset(Dataset):
     def __init__(self, img_dir, patch_size):
-
         self.img_dir = img_dir
         self.image_files = [f for f in os.listdir(img_dir) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
-        self.resize = transforms.Resize((patch_size, patch_size))
+        
+        # Define the transformation pipeline
+        self.transform = transforms.Compose([
+            transforms.Resize((patch_size, patch_size)),
+            transforms.ToTensor(), # Converts to [0, 1] range and CHW format
+        ])
 
     def __len__(self):
         return len(self.image_files)
@@ -37,13 +36,12 @@ class ImagePatchDataset(Dataset):
     def __getitem__(self, idx):
         img_path = os.path.join(self.img_dir, self.image_files[idx])
         image_rgb = Image.open(img_path).convert('RGB')
-        image_rgb = self.resize(image_rgb)
+        
+        # Apply transformations
+        image_tensor = self.transform(image_rgb)
 
-        # Convert to Lab for training, keep RGB for perceptual loss
-        image_lab_tensor = utils.rgb_to_lab(image_rgb)
-        image_rgb_tensor = transforms.ToTensor()(image_rgb)
-
-        return image_lab_tensor, image_rgb_tensor
+        # For an AutoEncoder, the input and the target are usually the same
+        return image_tensor, image_tensor
 
 dataset = ImagePatchDataset(cfg.data_dir, cfg.patch_size)
 train_loader = DataLoader(dataset, batch_size=cfg.batch_size, shuffle=True)
