@@ -7,6 +7,7 @@ import torch.optim as optim
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
+from piq import SSIMLoss
 
 from torchvision import transforms
 from torch.utils.data import Dataset, DataLoader
@@ -19,14 +20,14 @@ cfg = Config()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class ImagePatchDataset(Dataset):
+    
     def __init__(self, img_dir, patch_size):
         self.img_dir = img_dir
         self.image_files = [f for f in os.listdir(img_dir) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
         
-        # Define the transformation pipeline
         self.transform = transforms.Compose([
             transforms.Resize((patch_size, patch_size)),
-            transforms.ToTensor(), # Converts to [0, 1] range and CHW format
+            transforms.ToTensor()
         ])
 
     def __len__(self):
@@ -34,12 +35,9 @@ class ImagePatchDataset(Dataset):
 
     def __getitem__(self, idx):
         img_path = os.path.join(self.img_dir, self.image_files[idx])
-        image_rgb = Image.open(img_path).convert('RGB')
-        
-        # Apply transformations
+        image_rgb = Image.open(img_path).convert('RGB')        
         image_tensor = self.transform(image_rgb)
 
-        # For an AutoEncoder, the input and the target are usually the same
         return image_tensor, image_tensor
 
 dataset = ImagePatchDataset(cfg.data_dir, cfg.patch_size)
@@ -51,7 +49,7 @@ model = Auto_Encoder(cfg.patch_size, cfg.latent_size).to(device)
 
 mse_loss = nn.MSELoss()
 mae_loss = nn.L1Loss()
-# ssim = StructuralSimilarityIndexMeasure(data_range=2.0).to(device) # replace package
+ssim_loss = SSIMLoss()
 
 optimizer = optim.AdamW(model.parameters(), lr=cfg.learning_rate)
 
@@ -81,10 +79,9 @@ def train():
 
             mse = mse_loss(output, lab_images)
             mae = mae_loss(output, lab_images)
-            #ssim_loss = 1 - ssim(output[:, :1, :, :], lab_images[:, :1, :, :])
-            #loss = (0.5 * recon_loss + 0.5 * ssim_loss)
+            ssim = ssim_loss(output, lab_images)
         
-            loss = (0.2*mae + 0.8*mse)
+            loss = (0.1*mae + 0.5*mse + 0.4*ssim)
     
             loss.backward()
         
@@ -96,7 +93,7 @@ def train():
                 'Total': f"{loss.item():.4f}",
                 'MSE'  : f"{mse.item():.4f}",
                 'MAE': f"{mae.item():.4f}",
-                #'SSIM': f"{ssim_loss.item():.4f}"
+                'SSIM': f"{ssim.item():.4f}"
             })
 
         avg_loss = total_loss / len(train_loader)
