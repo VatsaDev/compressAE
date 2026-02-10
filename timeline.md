@@ -5,3 +5,8 @@ Old ckpt test, def some settings lost to orig, compression is in 3-5x range, not
 <img width="2549" height="1347" alt="image" src="https://github.com/user-attachments/assets/a101f7b7-c875-4060-8706-6a1ea5917360" />
 <img width="2547" height="1357" alt="image" src="https://github.com/user-attachments/assets/b0a601f2-1af9-426e-999e-d0df48a6abda" />
 <img width="2548" height="1367" alt="image" src="https://github.com/user-attachments/assets/3438d537-9322-4bc7-8512-b319201ee50f" />
+
+within testing and datachecks, modern equivalent of the old checkpoint, back in the old range
+the color compression should fix with training
+
+<img width="2000" height="1000" alt="image" src="https://github.com/user-attachments/assets/a23a1ca5-c488-4c67-9e39-4dc2a9609e25" />
