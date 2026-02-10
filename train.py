@@ -7,8 +7,6 @@ import torch.optim as optim
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
-from skimage.color import rgb2lab, lab2rgb
-# from torchmetrics.image import StructuralSimilarityIndexMeasure
 
 from torchvision import transforms
 from torchvision.models import vgg16
@@ -107,6 +105,7 @@ def train():
         avg_loss = total_loss / len(train_loader)
         print(f"Epoch {epoch+1} finished. Loss: {avg_loss:.6f}")
 
+        cfg.save_path = f"ckpt/epoch_{epoch+1}.pth"
         torch.save(model.state_dict(), cfg.save_path) # epoch ckpt save
 
 if __name__ == '__main__':
