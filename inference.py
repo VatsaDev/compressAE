@@ -49,8 +49,8 @@ def merge_patches_into_image(patches_rgb, image_shape):
             patch_idx += 1
     return full_image
 
-image_path = "test/easy.jpg"
-tolerance = 30 # basically works for any image, zfp will give no gains tho (using old tolerance)
+image_path = "test/hard.jpg"
+tolerance = 30 # zfp, the higher the more compressed
 
 # actual inference
 
@@ -75,7 +75,7 @@ with torch.no_grad():
 
 latent = latents.cpu().numpy().astype(np.float32)
 compressed_data = zfpy.compress_numpy(latent, tolerance=tolerance)
-zfp_path = "compressed_latent.zfp"
+zfp_path = "outs/compressed_latent.zfp"
 
 # lossy zfp stage
 with open(zfp_path, "wb") as f: 
@@ -87,8 +87,8 @@ else:
   zip_p = "7z"
 
 # lossless 7z stage
-seven_zip_path = "compressed_latents.zfp.7z"
-subprocess.run([zip_p, 'a', seven_zip_path, zfp_path, '-mx=9'])
+seven_zip_path = "outs/compressed_latents.zfp.7z"
+subprocess.run([zip_p, 'a', seven_zip_path, zfp_path, '-mx=9', '-ms=on'])
 
 print("\nmetrics:\n")
 original_size_kb = os.path.getsize(image_path) / 1024

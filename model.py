@@ -38,7 +38,6 @@ class Auto_Encoder(nn.Module):
         super(Auto_Encoder, self).__init__()
         
         nc = 256
-        nc4 = 64
         
         self.input_size = input_size
         self.latent_size = latent_size
@@ -49,19 +48,19 @@ class Auto_Encoder(nn.Module):
             nn.BatchNorm2d(nc),
             nn.SiLU(inplace=True),
             nn.AdaptiveAvgPool2d((latent_size, latent_size)),
-            nn.Conv2d(nc, nc4, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(nc4),
+            nn.Conv2d(nc, nc//4, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(nc//4),
             nn.SiLU(inplace=True),
-            nn.Conv2d(nc4, 3, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(nc//4, 3, kernel_size=3, stride=1, padding=1),
             nn.SiLU(inplace=True),
         )
 
         # Decoder
         self.dec = nn.Sequential(
-            nn.Conv2d(3, nc4, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(nc4),
+            nn.Conv2d(3, nc//4, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(nc//4),
             nn.SiLU(inplace=True),
-            nn.Conv2d(nc4, nc, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(nc//4, nc, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(nc),
             nn.SiLU(inplace=True),
             nn.Upsample(size=(input_size, input_size), mode='bilinear', align_corners=True),
