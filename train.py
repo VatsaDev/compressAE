@@ -17,6 +17,8 @@ from model import Auto_Encoder
 
 cfg = Config()
 
+#cfg.data_dir = "data/out" # bigger test folder
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class ImagePatchDataset(Dataset):
@@ -35,13 +37,25 @@ class ImagePatchDataset(Dataset):
 
     def __getitem__(self, idx):
         img_path = os.path.join(self.img_dir, self.image_files[idx])
-        image_rgb = Image.open(img_path).convert('RGB')        
+        try:
+          image_rgb = Image.open(img_path).convert('RGB')
+        except Exception as e:
+            print(f"Skipping corrupted file: {img_path}")
+            new_idx = (idx + 1) % len(self.image_files)
+            return self.__getitem__(new_idx)
+    
         image_tensor = self.transform(image_rgb)
-
         return image_tensor, image_tensor
 
 dataset = ImagePatchDataset(cfg.data_dir, cfg.patch_size)
 train_loader = DataLoader(dataset, batch_size=cfg.batch_size, shuffle=True)
+
+# qual-tests
+
+# get like 5 random patches, show before/after quality in a 2x5 table
+
+def test():
+  pass
 
 # setups 
 
