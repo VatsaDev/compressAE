@@ -1,0 +1,6 @@
+data/*
+ckpt/*
+plots/*
+__pycache__/    
+compressed_latent.zfp
+compressed_latent.zfp.7z
