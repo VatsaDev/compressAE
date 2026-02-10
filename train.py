@@ -9,7 +9,6 @@ from PIL import Image
 from tqdm import tqdm
 
 from torchvision import transforms
-from torchvision.models import vgg16
 from torch.utils.data import Dataset, DataLoader
 
 from cfg import Config
