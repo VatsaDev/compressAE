@@ -10,3 +10,7 @@ within testing and datachecks, modern equivalent of the old checkpoint, back in 
 the color compression should fix with training
 
 <img width="2000" height="1000" alt="image" src="https://github.com/user-attachments/assets/a23a1ca5-c488-4c67-9e39-4dc2a9609e25" />
+
+more data doesnt hurt SSIM loss, structure improves, but it forces the model to deal with a larger color spectrum, which increases loss, but helps model performance in a way, colors match better
+
+<img width="2000" height="1000" alt="image" src="https://github.com/user-attachments/assets/1bbf0f78-2b98-41eb-a4a9-9db851500cc4" />
