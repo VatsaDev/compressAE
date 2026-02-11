@@ -13,5 +13,10 @@ the color compression should fix with training
 
 more data doesnt hurt SSIM loss, structure improves, but it forces the model to deal with a larger color spectrum, which increases loss, but helps model performance in a way, colors match better
 
-<img width="2000" height="1000" alt="image" src="https://github.com/user-attachments/assets/1bbf0f78-2b98-41eb-a4a9-9db851500cc4" />
-*note, zfp was much weaker on this one, oddly enough compression seems to scale with loss or that color is more compressible when you decrease range?
+<img width="2000" height="1000" alt="image" src="https://github.com/user-attachments/assets/1bbf0f78-2b98-41eb-a4a9-9db851500cc4" /><br>
+> note, zfp was much weaker on this one, oddly enough compression seems to scale with loss or that color is more compressible when you decrease range?
+
+<br><br>
+
+<img width="562" height="432" alt="image" src="https://github.com/user-attachments/assets/d4e49c2c-d5ee-4205-ba06-001a62545080" /><br>
+> better detail instantly ruins compressiblity
