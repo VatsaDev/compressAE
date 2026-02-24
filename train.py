@@ -17,9 +17,9 @@ from model import Auto_Encoder
 
 cfg = Config()
 
-#cfg.data_dir = "data/out" # bigger test folder
-
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+scaler = torch.cuda.amp.GradScaler()
 
 class ImagePatchDataset(Dataset):
     
@@ -51,13 +51,12 @@ dataset = ImagePatchDataset(cfg.data_dir, cfg.patch_size)
 train_loader = DataLoader(dataset, batch_size=cfg.batch_size, shuffle=True)
 
 # qual-tests
-
 # get like 5 random patches, show before/after quality in a 2x5 table
 
 def test():
   pass
 
-# setups 
+# setup
 
 model = Auto_Encoder(cfg.patch_size, cfg.latent_size).to(device)
 
@@ -66,6 +65,8 @@ mae_loss = nn.L1Loss()
 ssim_loss = SSIMLoss()
 
 optimizer = optim.AdamW(model.parameters(), lr=cfg.learning_rate)
+
+# training
 
 def train():
 
@@ -87,19 +88,17 @@ def train():
 
             optimizer.zero_grad()
 
-            _, output = model(lab_images) # latent/output
+            with torch.amp.autocast():
+                _, output = model(lab_images) # latent/output        
 
-            # losses        
-
-            mse = mse_loss(output, lab_images)
-            mae = mae_loss(output, lab_images)
-            ssim = ssim_loss(output, lab_images)
-        
-            loss = (0.1*mae + 0.5*mse + 0.4*ssim)
+                mse = mse_loss(output, lab_images)
+                mae = mae_loss(output, lab_images)
+                ssim = ssim_loss(output, lab_images)
+                loss = (0.1*mae + 0.5*mse + 0.4*ssim)
     
-            loss.backward()
-        
-            optimizer.step()
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
 
             total_loss += loss.item()
 
@@ -110,6 +109,8 @@ def train():
                 'SSIM': f"{ssim.item():.4f}"
             })
 
+        # ADD TEST HERE
+        
         avg_loss = total_loss / len(train_loader)
         print(f"Epoch {epoch+1} finished. Loss: {avg_loss:.6f}")
 
