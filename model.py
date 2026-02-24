@@ -33,13 +33,18 @@ class Auto_Encoder(nn.Module):
             nn.Conv2d(nc, nc//4, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(nc//4),
             nn.SiLU(inplace=True),
-            nn.Conv2d(nc//4, 3, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(nc//4, nc//8, kernel_size=3, stride=1, padding=1),
+            nn.SiLU(inplace=True),
+            nn.Conv2d(nc//8, 3, kernel_size=3, stride=1, padding=1),
             nn.SiLU(inplace=True),
         )
 
         # Decoder
         self.dec = nn.Sequential(
-            nn.Conv2d(3, nc//4, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(3, nc//8, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(nc//8),
+            nn.SiLU(inplace=True),
+            nn.Conv2d(nc//8, nc//4, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(nc//4),
             nn.SiLU(inplace=True),
             nn.Conv2d(nc//4, nc, kernel_size=3, stride=1, padding=1),
