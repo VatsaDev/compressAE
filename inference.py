@@ -17,7 +17,7 @@ from model import Auto_Encoder
 
 cfg = Config()
 
-cfg.save_path = "ckpt/prod_AE.pth"
+cfg.save_path = "/content/compressAE/ckpt/epoch_100.pth"
 
 def preprocess_image(image_path, patch_size):
     img = Image.open(image_path).convert("RGB")
@@ -56,7 +56,7 @@ tolerance = 30 # zfp, the higher the more compressed
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-model = Auto_Encoder(cfg.patch_size, cfg.latent_size)
+model = Auto_Encoder(cfg.patch_size, cfg.latent_size, mode="norm")
 
 # handle old vs new model types
 
@@ -73,7 +73,7 @@ patches_tensor = patches_tensor.to(device)
 with torch.no_grad():
     latents, out = model.forward(patches_tensor)
 
-latent = latents.cpu().numpy().astype(np.float32)
+latent = latents.cpu().numpy().astype(np.float16).astype(np.float32)
 compressed_data = zfpy.compress_numpy(latent, tolerance=tolerance)
 zfp_path = "outs/compressed_latent.zfp"
 
@@ -127,5 +127,5 @@ axs[1].imshow(reconstructed_image)
 axs[1].set_title(f"Reconstructed Image ({seven_zip_size_kb:.2f} KB | {final_ratio:.2f}x Compression)"); axs[1].axis("off")
 
 plt.tight_layout()
-plt.savefig("plots/comp.png")
+plt.savefig("plots/comp_2.png")
 plt.show()
