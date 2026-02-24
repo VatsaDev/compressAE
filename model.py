@@ -9,38 +9,20 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-class MLP(nn.Module):
-
-    def __init__(self, in_f):
-        super().__init__()
-
-        self.into = nn.Linear(in_f, 4*in_f)
-        self.silu = nn.SiLU(inplace=True)
-        self.out = nn.Linear(4*in_f, in_f)
-
-    def forward(self, x):
-
-        B, C, H, W = x.shape
-
-        x = x.view(B, H, W, C)
-        
-        x = self.into(x) # channel wise
-        x = self.silu(x)
-        x = self.out(x)
-
-        x = x.view(B, C, H, W)
-
-        return x
+from torch.ao.quantization import QuantStub, DeQuantStub, get_default_qat_qconfig, prepare_qat_inplace
         
 class Auto_Encoder(nn.Module):
 
-    def __init__(self, input_size, latent_size):
+    def __init__(self, input_size, latent_size, mode):
         super(Auto_Encoder, self).__init__()
         
         nc = 256
         
         self.input_size = input_size
         self.latent_size = latent_size
+
+        self.quant = QuantStub()
+        self.dequant = DeQuantStub()
 
         # Encoder
         self.enc = nn.Sequential(
@@ -69,8 +51,15 @@ class Auto_Encoder(nn.Module):
         )
 
     def forward(self, x): # output image and latent
-        
-        encoded = self.enc(x)
-        decoded = self.dec(encoded)
 
+        if mode=="norm":
+            encoded = self.enc(x)
+            decoded = self.dec(encoded)
+
+        if mode=="quant":
+            x = self.quant(x)
+            encoded = self.encoder(x)
+            output = self.decoder(encoded)
+            output = self.dequant(output)
+        
         return encoded, decoded
