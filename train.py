@@ -58,7 +58,7 @@ def test():
 
 # setup
 
-model = Auto_Encoder(cfg.patch_size, cfg.latent_size).to(device)
+model = Auto_Encoder(cfg.patch_size, cfg.latent_size, mode="Norm").to(device)
 
 mse_loss = nn.MSELoss()
 mae_loss = nn.L1Loss()
