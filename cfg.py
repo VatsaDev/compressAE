@@ -2,8 +2,8 @@ class Config:
     
     patch_size = 256
     latent_size = 16
-    batch_size = 120
+    batch_size = 32
     learning_rate = 3e-3
     data_dir = "data/"
-    epochs = 200
+    epochs = 100
     save_path = "ckpt/AE.pth"
