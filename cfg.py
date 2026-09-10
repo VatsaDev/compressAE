@@ -1,6 +1,6 @@
 class Config:
     
-    patch_size = 128
+    patch_size = 256
     latent_size = 16
     batch_size = 120
     learning_rate = 3e-3
