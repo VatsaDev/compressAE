@@ -45,21 +45,24 @@ class Auto_Encoder(nn.Module):
 
         # Decoder
         self.dec = nn.Sequential(
-            nn.Conv2d(3, nc//16, kernel_size=3, stride=1, padding=1),
-            nn.GroupNorm(1,nc//16),
-            nn.SiLU(inplace=True),
-            nn.Conv2d(nc//16, nc//8, kernel_size=3, stride=1, padding=1),
-            nn.GroupNorm(1,nc//8),
-            nn.SiLU(inplace=True),
-            nn.Conv2d(nc//8, nc//4, kernel_size=3, stride=1, padding=1),
-            nn.GroupNorm(1,nc//4),
-            nn.SiLU(inplace=True),
-            nn.Conv2d(nc//4, nc, kernel_size=3, stride=1, padding=1),
-            nn.GroupNorm(1,nc),
-            nn.SiLU(inplace=True),
-            nn.Upsample(size=(input_size, input_size), mode='bilinear', align_corners=True),
-            nn.Conv2d(nc, 3, kernel_size=3, stride=1, padding=1),
-            nn.Sigmoid()
+          nn.Conv2d(3, 64, 3, padding=1),
+          nn.GroupNorm(1, 64),
+          nn.SiLU(inplace=True),
+
+          nn.ConvTranspose2d(64, 64, 4, stride=2, padding=1),   # 16 → 32
+          nn.GroupNorm(1, 64),
+          nn.SiLU(inplace=True),
+
+          nn.ConvTranspose2d(64, 32, 4, stride=2, padding=1),   # 32 → 64
+          nn.GroupNorm(1, 32),
+          nn.SiLU(inplace=True),
+
+          nn.ConvTranspose2d(32, 16, 4, stride=2, padding=1),   # 64 → 128
+          nn.GroupNorm(1, 16),
+          nn.SiLU(inplace=True),
+
+          nn.ConvTranspose2d(16, 3, 4, stride=2, padding=1),    # 128 → 256
+          nn.Sigmoid()
         )
 
     def forward(self, x): # output image and latent
